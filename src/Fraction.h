@@ -1,6 +1,7 @@
 #include <type_traits>
 #include <compare>
 #include <cmath>
+#include <stdexcept>
 
 template <typename T>
     requires std::is_integral_v<T>
