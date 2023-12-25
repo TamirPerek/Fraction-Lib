@@ -14,6 +14,7 @@ class Fraction;
  * @param xValue The floating-point value to convert.
  * @param xTolerance The tolerance for considering xValue as zero.
  * @return The Fraction representation of the input value.
+ * @exception std::invalid_argument if xTolerance is less than or equal to zero.
  */
 template <typename Arg_t, typename Integral_t = int>
 [[nodiscard]] constexpr Fraction<Integral_t> to_Fraction(Arg_t xValue, Arg_t xTolerance = std::numeric_limits<Arg_t>::epsilon()) noexcept(false)
