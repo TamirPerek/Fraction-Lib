@@ -47,6 +47,13 @@ TEST_F(FractionTest, simplify)
     EXPECT_DOUBLE_EQ(tTest.to_double(), 1.375);
 
     EXPECT_EQ(Fraction(7, 20).simplify(), Fraction(7, 20));
+
+    Fraction<int> f(2, 4);
+
+    f.simplify();
+
+    EXPECT_EQ(f.getNumerator(), 1);
+    EXPECT_EQ(f.getDenominator(), 2);
 }
 
 TEST_F(FractionTest, CreateFunction)
@@ -248,4 +255,44 @@ TEST_F(FractionTest, ChainOperators)
     EXPECT_EQ(tTest, Fraction(95, 80));
     tTest.simplify();
     EXPECT_EQ(tTest, Fraction(19, 16));
+}
+
+// Validating constructor with default values
+TEST_F(FractionTest, DefaultConstructor)
+{
+    Fraction<int> f;
+
+    EXPECT_EQ(f.getNumerator(), 0);
+    EXPECT_EQ(f.getDenominator(), 1);
+}
+
+// Testing arithmetic operations
+TEST_F(FractionTest, ArithmeticOperations)
+{
+    Fraction f1(1, 2);
+    Fraction f2(1, 3);
+
+    EXPECT_EQ((f1 + f2).getNumerator(), 5);
+    EXPECT_EQ((f1 - f2).getNumerator(), 1);
+
+    f1 *= 2;
+    EXPECT_EQ(f1, Fraction(2,2));
+    f1.simplify();
+    EXPECT_EQ(f1, Fraction(1, 1));
+
+    f1 /= 2;
+    EXPECT_EQ(f1, Fraction(1, 2));
+}
+
+// Testing comparison operators
+TEST_F(FractionTest, ComparisonOperators)
+{
+    Fraction f1(1, 2);
+    Fraction f2(1, 3);
+
+    EXPECT_GT(f1, f2);
+    EXPECT_FALSE(f1 == f2);
+
+    EXPECT_LT(Fraction(1, 3), Fraction(1, 2));
+    EXPECT_EQ(Fraction(1, 3), Fraction(1, 3));
 }

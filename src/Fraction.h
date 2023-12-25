@@ -62,8 +62,8 @@ template <typename T>
     requires std::is_integral_v<T>
 class Fraction
 {
-    T mNumerator; ///< Numerator of the fraction.
-    T mDenominator; ///< Denominator of the fraction.
+    T mNumerator{0}; ///< Numerator of the fraction.
+    T mDenominator{1}; ///< Denominator of the fraction.
 
     /**
      * @brief Calculates the greatest common divisor (GCD) of two numbers.
@@ -102,10 +102,26 @@ class Fraction
     }
 
 public:
+    /**
+     * Default constructor.
+     * Constructs a Fraction with a numerator of 0 and denominator of 1.
+     */
     constexpr Fraction() noexcept(std::is_nothrow_default_constructible_v<T>)
         requires std::is_default_constructible_v<T>
     = default;
 
+    /**
+     * @brief Constructs a Fraction from a numerator and optional denominator.
+     *
+     * This is an explicit constructor that allows constructing a Fraction from a
+     * numerator and optional denominator. If the denominator is not provided, it
+     * defaults to 1. The constructor will throw an invalid_argument exception if
+     * the denominator is 0.
+     *
+     * @param xNumerator - The numerator value for the fraction.
+     * @param mDenominator - Optional denominator value, defaults to 1 if not provided.
+     * @exception std::invalid_argument - If the denominator is 0.
+     */
     constexpr explicit Fraction(T &&xNumerator, T &&mDenominator = 1) noexcept(false)
         : mNumerator{xNumerator}, mDenominator{mDenominator}
     {
@@ -113,6 +129,17 @@ public:
             throw std::invalid_argument("Denominator must be unequal zero!");
     }
 
+    /**
+     * @brief Constructs a Fraction from a numerator and denominator.
+     *
+     * This constructor allows creating a Fraction from a numerator and denominator.
+     * The denominator defaults to 1 if not provided.
+     * Throws an invalid_argument exception if the denominator is 0.
+     *
+     * @param xNumerator - The numerator value for the fraction.
+     * @param mDenominator - The denominator value for the fraction. Defaults to 1.
+     * @exception std::invalid_argument - If the denominator is 0.
+     */
     constexpr explicit Fraction(const T &xNumerator, const T &mDenominator = 1) noexcept(false)
         : mNumerator{xNumerator}, mDenominator{mDenominator}
     {
@@ -120,76 +147,170 @@ public:
             throw std::invalid_argument("Denominator must be unequal zero!");
     }
 
+    /**
+     * @brief Copy constructor.
+     * Constructs a Fraction from another Fraction, copying its numerator and denominator.
+     * This constructor is declared as defaulted to use the compiler-generated version.
+     */
     constexpr Fraction(const Fraction &) noexcept(std::is_nothrow_copy_constructible_v<T>)
         requires std::is_copy_constructible_v<T>
     = default;
 
+    /**
+     * @brief Move constructor.
+     * Constructs a Fraction by moving from another Fraction.
+     */
     constexpr Fraction(Fraction &&) noexcept(std::is_nothrow_move_constructible_v<T>)
         requires std::is_move_constructible_v<T>
     = default;
 
+    /**
+     * @brief Copy assignment operator.
+     * Assigns the value of another Fraction to this Fraction,
+     * replacing the current value.
+     * Uses the default implementation.
+     */
     constexpr Fraction &operator=(const Fraction &) noexcept(std::is_nothrow_copy_assignable_v<T>)
         requires std::is_copy_assignable_v<T>
     = default;
 
+    /**
+     * @brief Move assignment operator.
+     * Assigns the value of another Fraction to this Fraction
+     * by moving from that Fraction.
+     */
     constexpr Fraction &operator=(Fraction &&) noexcept(std::is_nothrow_move_assignable_v<T>)
         requires std::is_move_assignable_v<T>
     = default;
 
-    // TODO: Math?
+    /**
+     * @brief Compares this Fraction with another Fraction using the spaceship operator.
+     * 
+     * Returns std::strong_ordering::less if this Fraction is less than the other,
+     * std::strong_ordering::greater if this Fraction is greater than the other,
+     * and std::strong_ordering::equal if they are equal.
+     * Fractions with a denominator of 0 are considered equal.
+     */
     [[nodiscard]] constexpr auto operator<=>(const Fraction &xIn) const noexcept
     {
-        return (mNumerator / mDenominator) <=> (xIn.mNumerator / xIn.mDenominator);
+        if (mDenominator == 0 || xIn.mDenominator == 0)
+        {
+            return std::strong_ordering::equal;
+        }
+
+        auto lhsRatio = static_cast<long double>(mNumerator) / mDenominator;
+        auto rhsRatio = static_cast<long double>(xIn.mNumerator) / xIn.mDenominator;
+
+        if (lhsRatio < rhsRatio)
+            return std::strong_ordering::less;
+        if (lhsRatio > rhsRatio)
+            return std::strong_ordering::greater;
+        return std::strong_ordering::equal;
     }
 
+    /**
+     * @brief Compares this Fraction with another Fraction for equality using the equality operator.
+     *
+     * Returns true if this Fraction and the other Fraction have equal numerators and denominators.
+     * Returns false otherwise.
+     */
     [[nodiscard]] constexpr bool operator==(const Fraction &xIn) const noexcept
     {
         return mDenominator == xIn.mDenominator && mNumerator == xIn.mNumerator;
     }
 
+    /**
+     * @brief Gets a constant reference to the denominator of this fraction.
+     *
+     * @return A constant reference to the denominator.
+     */
     [[nodiscard]] constexpr const T &getDenominator() const noexcept
     {
         return mDenominator;
     }
 
+    /**
+     * @brief Gets the denominator for this fraction.
+     *
+     * @return The denominator.
+     */
     [[nodiscard]] constexpr T getDenominator() noexcept
     {
         return mDenominator;
     }
 
+    /**
+     * @brief Gets a constant reference to the numerator of this fraction.
+     *
+     * @return A constant reference to the numerator.
+     */
     [[nodiscard]] constexpr const T &getNumerator() const noexcept
     {
         return mNumerator;
     }
 
+    /**
+     * @brief Gets the numerator for this fraction.
+     *
+     * @return The numerator.
+     */
     [[nodiscard]] constexpr T getNumerator() noexcept
     {
         return mNumerator;
     }
 
+    /**
+     * @brief Converts the fraction to a double precision floating point number.
+     *
+     * @return The fraction converted to a double.
+     */
     [[nodiscard]] constexpr double to_double() const noexcept
     {
         return static_cast<double>(mNumerator) / static_cast<double>(mDenominator);
     }
+    /**
+     * @brief Converts the fraction to a single precision floating point number.
+     *
+     * @return The fraction converted to a float.
+     */
     [[nodiscard]] constexpr double to_float() const noexcept
     {
         return static_cast<float>(mNumerator) / static_cast<float>(mDenominator);
     }
+    /**
+     * @brief Converts the fraction to a long double precision floating point number.
+     *
+     * @return The fraction converted to a long double.
+     */
     [[nodiscard]] constexpr double to_long_double() const noexcept
     {
         return static_cast<long double>(mNumerator) / static_cast<long double>(mDenominator);
     }
 
+    /**
+     * @brief Returns the greatest common divisor of the numerator and denominator.
+     */
     [[nodiscard]] constexpr T GCD() const noexcept
     {
         return GDC(mNumerator, mDenominator);
     }
 
+    /**
+     * Calculates the least common multiple of this fraction's denominator
+     * and the passed fraction's denominator.
+     *
+     * @param other The other fraction to calculate the LCM with.
+     * @return The least common multiple of the denominators.
+     */
     [[nodiscard]] constexpr T LCM(const Fraction<T> &other) const noexcept
     {
         return LCM(mDenominator, other.mDenominator);
     }
 
+    /** 
+     * @brief Simplifies the fraction by dividing both the numerator and denominator by their greatest common divisor.
+     * @return Returns a reference to the simplified fraction.
+     **/
     constexpr Fraction &simplify() noexcept
     {
         const auto tGDC = GDC(mNumerator, mDenominator);
@@ -201,7 +322,7 @@ public:
 
     constexpr Fraction<T> &operator+=(const Fraction<T> &xOther)
     {
-        if (mNumerator != xOther.mNumerator)
+        if (mDenominator != xOther.mDenominator)
         {
             const auto tLCM = LCM(mDenominator, xOther.mDenominator);
 
@@ -232,7 +353,7 @@ public:
 
     constexpr Fraction<T> &operator-=(const Fraction<T> &xOther)
     {
-        if (mNumerator != xOther.mNumerator)
+        if (mDenominator != xOther.mDenominator)
         {
             const auto tLCM = LCM(mDenominator, xOther.mDenominator);
 
@@ -241,7 +362,7 @@ public:
         }
         else
         {
-            mNumerator += xOther.mNumerator;
+            mNumerator -= xOther.mNumerator;
         }
 
         return *this;
