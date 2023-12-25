@@ -27,7 +27,7 @@ template <typename Arg_t, typename Integral_t = int>
         return Fraction<Integral_t>{0, 1};
     }
 
-    Arg_t sign = (xValue < 0) ? -1.0 : 1.0;
+    Arg_t sign = (xValue < 0) ? static_cast<Arg_t>(-1.0) : static_cast<Arg_t>(1.0);
     xValue = std::abs(xValue);
 
     Arg_t epsilon = xTolerance;
@@ -44,7 +44,7 @@ template <typename Arg_t, typename Integral_t = int>
         k1 = a * k1 + k2;
         k2 = tmp;
 
-        x = 1.0 / (x - a);
+        x = static_cast<Arg_t>(1.0) / (x - a);
 
         if (std::abs(h1 / k1 - xValue) < xValue * epsilon)
         {
