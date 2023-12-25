@@ -3,8 +3,8 @@
 #include <cmath>
 #include <stdexcept>
 
-template <typename T>
-    requires std::is_integral_v<T>
+template <typename Type>
+    requires std::is_integral_v<Type>
 class Fraction;
 
 /**
@@ -59,12 +59,12 @@ template <typename Arg_t, typename Integral_t = int>
 /**
  * @brief Represents a fraction with integral numerator and denominator.
  */
-template <typename T>
-    requires std::is_integral_v<T>
+template <typename Type>
+    requires std::is_integral_v<Type>
 class Fraction
 {
-    T mNumerator{0}; ///< Numerator of the fraction.
-    T mDenominator{1}; ///< Denominator of the fraction.
+    Type mNumerator{0}; ///< Numerator of the fraction.
+    Type mDenominator{1}; ///< Denominator of the fraction.
 
     /**
      * @brief Calculates the greatest common divisor (GCD) of two numbers.
@@ -72,7 +72,7 @@ class Fraction
      * @param b The second number.
      * @return The GCD of a and b.
      */
-    constexpr T GDC(const T &a, const T &b) noexcept
+    constexpr Type GDC(const Type &a, const Type &b) noexcept
     {
         auto tResult = std::min(a, b);
         while (tResult > 0)
@@ -93,7 +93,7 @@ class Fraction
      * @param b The second number.
      * @return The LCM of a and b.
      */
-    constexpr T LCM(const T &a, const T &b) noexcept
+    constexpr Type LCM(const Type &a, const Type &b) noexcept
     {
         if (a == 0 || b == 0)
         {
@@ -107,8 +107,8 @@ public:
      * Default constructor.
      * Constructs a Fraction with a numerator of 0 and denominator of 1.
      */
-    constexpr Fraction() noexcept(std::is_nothrow_default_constructible_v<T>)
-        requires std::is_default_constructible_v<T>
+    constexpr Fraction() noexcept(std::is_nothrow_default_constructible_v<Type>)
+        requires std::is_default_constructible_v<Type>
     = default;
 
     /**
@@ -123,7 +123,7 @@ public:
      * @param mDenominator - Optional denominator value, defaults to 1 if not provided.
      * @exception std::invalid_argument - If the denominator is 0.
      */
-    constexpr explicit Fraction(T &&xNumerator, T &&mDenominator = 1) noexcept(false)
+    constexpr explicit Fraction(Type &&xNumerator, Type &&mDenominator = 1) noexcept(false)
         : mNumerator{xNumerator}, mDenominator{mDenominator}
     {
         if (mDenominator == 0)
@@ -141,7 +141,7 @@ public:
      * @param mDenominator - The denominator value for the fraction. Defaults to 1.
      * @exception std::invalid_argument - If the denominator is 0.
      */
-    constexpr explicit Fraction(const T &xNumerator, const T &mDenominator = 1) noexcept(false)
+    constexpr explicit Fraction(const Type &xNumerator, const Type &mDenominator = 1) noexcept(false)
         : mNumerator{xNumerator}, mDenominator{mDenominator}
     {
         if (mDenominator == 0)
@@ -153,16 +153,16 @@ public:
      * Constructs a Fraction from another Fraction, copying its numerator and denominator.
      * This constructor is declared as defaulted to use the compiler-generated version.
      */
-    constexpr Fraction(const Fraction &) noexcept(std::is_nothrow_copy_constructible_v<T>)
-        requires std::is_copy_constructible_v<T>
+    constexpr Fraction(const Fraction &) noexcept(std::is_nothrow_copy_constructible_v<Type>)
+        requires std::is_copy_constructible_v<Type>
     = default;
 
     /**
      * @brief Move constructor.
      * Constructs a Fraction by moving from another Fraction.
      */
-    constexpr Fraction(Fraction &&) noexcept(std::is_nothrow_move_constructible_v<T>)
-        requires std::is_move_constructible_v<T>
+    constexpr Fraction(Fraction &&) noexcept(std::is_nothrow_move_constructible_v<Type>)
+        requires std::is_move_constructible_v<Type>
     = default;
 
     /**
@@ -171,8 +171,8 @@ public:
      * replacing the current value.
      * Uses the default implementation.
      */
-    constexpr Fraction &operator=(const Fraction &) noexcept(std::is_nothrow_copy_assignable_v<T>)
-        requires std::is_copy_assignable_v<T>
+    constexpr Fraction &operator=(const Fraction &) noexcept(std::is_nothrow_copy_assignable_v<Type>)
+        requires std::is_copy_assignable_v<Type>
     = default;
 
     /**
@@ -180,8 +180,8 @@ public:
      * Assigns the value of another Fraction to this Fraction
      * by moving from that Fraction.
      */
-    constexpr Fraction &operator=(Fraction &&) noexcept(std::is_nothrow_move_assignable_v<T>)
-        requires std::is_move_assignable_v<T>
+    constexpr Fraction &operator=(Fraction &&) noexcept(std::is_nothrow_move_assignable_v<Type>)
+        requires std::is_move_assignable_v<Type>
     = default;
 
     /**
@@ -225,7 +225,7 @@ public:
      *
      * @return A constant reference to the denominator.
      */
-    [[nodiscard]] constexpr const T &getDenominator() const noexcept
+    [[nodiscard]] constexpr const Type &getDenominator() const noexcept
     {
         return mDenominator;
     }
@@ -235,7 +235,7 @@ public:
      *
      * @return The denominator.
      */
-    [[nodiscard]] constexpr T getDenominator() noexcept
+    [[nodiscard]] constexpr Type getDenominator() noexcept
     {
         return mDenominator;
     }
@@ -245,7 +245,7 @@ public:
      *
      * @return A constant reference to the numerator.
      */
-    [[nodiscard]] constexpr const T &getNumerator() const noexcept
+    [[nodiscard]] constexpr const Type &getNumerator() const noexcept
     {
         return mNumerator;
     }
@@ -255,7 +255,7 @@ public:
      *
      * @return The numerator.
      */
-    [[nodiscard]] constexpr T getNumerator() noexcept
+    [[nodiscard]] constexpr Type getNumerator() noexcept
     {
         return mNumerator;
     }
@@ -291,7 +291,7 @@ public:
     /**
      * @brief Returns the greatest common divisor of the numerator and denominator.
      */
-    [[nodiscard]] constexpr T GCD() const noexcept
+    [[nodiscard]] constexpr Type GCD() const noexcept
     {
         return GDC(mNumerator, mDenominator);
     }
@@ -303,7 +303,7 @@ public:
      * @param other The other fraction to calculate the LCM with.
      * @return The least common multiple of the denominators.
      */
-    [[nodiscard]] constexpr T LCM(const Fraction<T> &other) const noexcept
+    [[nodiscard]] constexpr Type LCM(const Fraction<Type> &other) const noexcept
     {
         return LCM(mDenominator, other.mDenominator);
     }
@@ -321,7 +321,7 @@ public:
         return *this;
     }
 
-    constexpr Fraction<T> &operator+=(const Fraction<T> &xOther)
+    constexpr Fraction<Type> &operator+=(const Fraction<Type> &xOther)
     {
         if (mDenominator != xOther.mDenominator)
         {
@@ -339,20 +339,20 @@ public:
     }
 
     template <typename Arg_t>
-    constexpr Fraction<T> &operator+=(const Arg_t &xOther)
+    constexpr Fraction<Type> &operator+=(const Arg_t &xOther)
         requires std::is_floating_point_v<Arg_t>
     {
-        const auto tOther = to_Fraction<Arg_t, T>(xOther);
+        const auto tOther = to_Fraction<Arg_t, Type>(xOther);
 
         return *this += tOther;
     }
 
-    constexpr Fraction<T> &operator+=(const T &xOther)
+    constexpr Fraction<Type> &operator+=(const Type &xOther)
     {
-        return *this += Fraction<T>(xOther, 1);
+        return *this += Fraction<Type>(xOther, 1);
     }
 
-    constexpr Fraction<T> &operator-=(const Fraction<T> &xOther)
+    constexpr Fraction<Type> &operator-=(const Fraction<Type> &xOther)
     {
         if (mDenominator != xOther.mDenominator)
         {
@@ -370,20 +370,20 @@ public:
     }
 
     template <typename Arg_t>
-    constexpr Fraction<T> &operator-=(const Arg_t &xOther)
+    constexpr Fraction<Type> &operator-=(const Arg_t &xOther)
         requires std::is_floating_point_v<Arg_t>
     {
-        const auto tOther = to_Fraction<Arg_t, T>(xOther);
+        const auto tOther = to_Fraction<Arg_t, Type>(xOther);
 
         return *this -= tOther;
     }
 
-    constexpr Fraction<T> &operator-=(const T &xOther)
+    constexpr Fraction<Type> &operator-=(const Type &xOther)
     {
-        return *this -= Fraction<T>(xOther, 1);
+        return *this -= Fraction<Type>(xOther, 1);
     }
 
-    constexpr Fraction<T> &operator*=(const Fraction<T> &xOther)
+    constexpr Fraction<Type> &operator*=(const Fraction<Type> &xOther)
     {
         mNumerator *= xOther.mNumerator;
         mDenominator *= xOther.mDenominator;
@@ -392,22 +392,22 @@ public:
     }
 
     template <typename Arg_t>
-    constexpr Fraction<T> &operator*=(const Arg_t &xOther)
+    constexpr Fraction<Type> &operator*=(const Arg_t &xOther)
         requires std::is_floating_point_v<Arg_t>
     {
-        const auto tOther = to_Fraction<Arg_t, T>(xOther);
+        const auto tOther = to_Fraction<Arg_t, Type>(xOther);
 
         return *this *= tOther;
     }
 
-    constexpr Fraction<T> &operator*=(const T &xOther)
+    constexpr Fraction<Type> &operator*=(const Type &xOther)
     {
         mNumerator *= xOther;
 
         return *this;
     }
 
-    constexpr Fraction<T> &operator/=(const Fraction<T> &xOther)
+    constexpr Fraction<Type> &operator/=(const Fraction<Type> &xOther)
     {
         mNumerator *= xOther.mDenominator;
         mDenominator *= xOther.mNumerator;
@@ -416,40 +416,40 @@ public:
     }
 
     template <typename Arg_t>
-    constexpr Fraction<T> &operator/=(const Arg_t &xOther)
+    constexpr Fraction<Type> &operator/=(const Arg_t &xOther)
         requires std::is_floating_point_v<Arg_t>
     {
-        const auto tOther = to_Fraction<Arg_t, T>(xOther);
+        const auto tOther = to_Fraction<Arg_t, Type>(xOther);
 
         return *this /= tOther;
     }
 
-    constexpr Fraction<T> &operator/=(const T &xOther)
+    constexpr Fraction<Type> &operator/=(const Type &xOther)
     {
         mDenominator *= xOther;
 
         return *this;
     }
 
-    constexpr friend Fraction<T> operator+(Fraction<T> lhs, const Fraction<T> &rhs)
+    constexpr friend Fraction<Type> operator+(Fraction<Type> lhs, const Fraction<Type> &rhs)
     {
         lhs += rhs;
         return lhs;
     }
 
-    constexpr friend Fraction<T> operator-(Fraction<T> lhs, const Fraction<T> &rhs)
+    constexpr friend Fraction<Type> operator-(Fraction<Type> lhs, const Fraction<Type> &rhs)
     {
         lhs -= rhs;
         return lhs;
     }
 
-    constexpr friend Fraction<T> operator*(Fraction<T> lhs, const Fraction<T> &rhs)
+    constexpr friend Fraction<Type> operator*(Fraction<Type> lhs, const Fraction<Type> &rhs)
     {
         lhs *= rhs;
         return lhs;
     }
 
-    constexpr friend Fraction<T> operator/(Fraction<T> lhs, const Fraction<T> &rhs)
+    constexpr friend Fraction<Type> operator/(Fraction<Type> lhs, const Fraction<Type> &rhs)
     {
         lhs /= rhs;
         return lhs;
@@ -457,7 +457,7 @@ public:
 
     template <typename Arg_t>
         requires std::is_floating_point_v<Arg_t>
-    constexpr friend Fraction<T> operator+(Fraction<T> lhs, const Arg_t &rhs)
+    constexpr friend Fraction<Type> operator+(Fraction<Type> lhs, const Arg_t &rhs)
     {
         lhs += rhs;
         return lhs;
@@ -465,7 +465,7 @@ public:
 
     template <typename Arg_t>
         requires std::is_floating_point_v<Arg_t>
-    constexpr friend Fraction<T> operator-(Fraction<T> lhs, const Arg_t &rhs)
+    constexpr friend Fraction<Type> operator-(Fraction<Type> lhs, const Arg_t &rhs)
     {
         lhs -= rhs;
         return lhs;
@@ -473,7 +473,7 @@ public:
 
     template <typename Arg_t>
         requires std::is_floating_point_v<Arg_t>
-    constexpr friend Fraction<T> operator*(Fraction<T> lhs, const Arg_t &rhs)
+    constexpr friend Fraction<Type> operator*(Fraction<Type> lhs, const Arg_t &rhs)
     {
         lhs *= rhs;
         return lhs;
@@ -481,7 +481,7 @@ public:
 
     template <typename Arg_t>
         requires std::is_floating_point_v<Arg_t>
-    constexpr friend Fraction<T> operator/(Fraction<T> lhs, const Arg_t &rhs)
+    constexpr friend Fraction<Type> operator/(Fraction<Type> lhs, const Arg_t &rhs)
     {
         lhs /= rhs;
         return lhs;
@@ -489,7 +489,7 @@ public:
 
     template <typename Arg_t>
         requires std::is_floating_point_v<Arg_t>
-    constexpr friend Fraction<T> operator+(const Arg_t &lhs, Fraction<T> rhs)
+    constexpr friend Fraction<Type> operator+(const Arg_t &lhs, Fraction<Type> rhs)
     {
         rhs += lhs;
         return rhs;
@@ -497,16 +497,16 @@ public:
 
     template <typename Arg_t>
         requires std::is_floating_point_v<Arg_t>
-    constexpr friend Fraction<T> operator-(const Arg_t &lhs, const Fraction<T> &rhs)
+    constexpr friend Fraction<Type> operator-(const Arg_t &lhs, const Fraction<Type> &rhs)
     {
-        auto tTemp = to_Fraction<Arg_t, T>(lhs);
+        auto tTemp = to_Fraction<Arg_t, Type>(lhs);
         tTemp -= rhs;
         return tTemp;
     }
 
     template <typename Arg_t>
         requires std::is_floating_point_v<Arg_t>
-    constexpr friend Fraction<T> operator*(const Arg_t &lhs, Fraction<T> rhs)
+    constexpr friend Fraction<Type> operator*(const Arg_t &lhs, Fraction<Type> rhs)
     {
         rhs *= lhs;
         return rhs;
@@ -514,9 +514,9 @@ public:
 
     template <typename Arg_t>
         requires std::is_floating_point_v<Arg_t>
-    constexpr friend Fraction<T> operator/(const Arg_t &lhs, Fraction<T> rhs)
+    constexpr friend Fraction<Type> operator/(const Arg_t &lhs, Fraction<Type> rhs)
     {
-        auto tTemp = to_Fraction<Arg_t, T>(lhs);
+        auto tTemp = to_Fraction<Arg_t, Type>(lhs);
         tTemp /= rhs;
         return tTemp;
     }
