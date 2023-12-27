@@ -7,8 +7,6 @@ set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED True)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-enable_testing()
-
 add_executable(${THIS} 
     FractionTests.cpp
 )
