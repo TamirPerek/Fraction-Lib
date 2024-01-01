@@ -6,7 +6,6 @@
 
 // Concepts for convertible_to. -> My stdlib doesn't have this at the moment. :(
 template <class From, class To>
-requires 
 concept convertible_to = std::is_convertible_v<From, To> && requires { static_cast<To>(std::declval<From>()); };
 
 // Concepts for custom types.
