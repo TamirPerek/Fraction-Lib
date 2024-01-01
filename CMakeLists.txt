@@ -12,11 +12,6 @@ option(FRACTION_INCLUDE_TESTS "Enables unit tests with googletest" OFF)
 add_subdirectory(src)
 add_subdirectory(lib)
 
-if(NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    set(FRACTION_INCLUDE_TESTS OFF)
-endif()
-
-
 if(FRACTION_INCLUDE_TESTS)
     add_subdirectory(test) 
     enable_testing()
