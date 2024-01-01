@@ -2,9 +2,26 @@
 #include <compare>
 #include <cmath>
 #include <stdexcept>
+#include <concepts>
 
-template <typename Type>
-    requires std::is_integral_v<Type>
+
+template <class From, class To>
+concept convertible_to = std::is_convertible_v<From, To> && requires { static_cast<To>(std::declval<From>()); };
+
+template <typename T>
+concept CustomType = requires(T a, T b) {
+    { a + b } -> ::convertible_to<T>;
+    { a - b } -> ::convertible_to<T>;
+    { a * b } -> ::convertible_to<T>;
+    { a / b } -> ::convertible_to<T>;
+    // Weitere Operatoren können hinzugefügt werden
+};
+
+// Konzept, das alle Basisdatentypen und benutzerdefinierten Typen mit überladenen Operatoren erlaubt
+template <typename T>
+concept MathType = std::is_arithmetic_v<T> || CustomType<T>;
+
+template <MathType Type>
 class Fraction;
 
 /**
@@ -16,7 +33,7 @@ class Fraction;
  * @return The Fraction representation of the input value.
  * @exception std::invalid_argument if xTolerance is less than or equal to zero.
  */
-template <typename Arg_t, typename Integral_t = int>
+template <typename Arg_t, MathType Integral_t = int>
 [[nodiscard]] constexpr Fraction<Integral_t> to_Fraction(Arg_t xValue, Arg_t xTolerance = std::numeric_limits<Arg_t>::epsilon()) noexcept(false)
     requires std::is_floating_point_v<Arg_t> && std::is_integral_v<Integral_t>
 {
@@ -59,12 +76,11 @@ template <typename Arg_t, typename Integral_t = int>
 /**
  * @brief Represents a fraction with integral numerator and denominator.
  */
-template <typename Type>
-    requires std::is_integral_v<Type>
+template <MathType Type>
 class Fraction
 {
-    Type mNumerator{0}; ///< Numerator of the fraction.
-    Type mDenominator{1}; ///< Denominator of the fraction.
+    Type mNumerator;   ///< Numerator of the fraction.
+    Type mDenominator; ///< Denominator of the fraction.
 
     /**
      * @brief Calculates the greatest common divisor (GCD) of two numbers.
@@ -186,7 +202,7 @@ public:
 
     /**
      * @brief Compares this Fraction with another Fraction using the spaceship operator.
-     * 
+     *
      * Returns std::strong_ordering::less if this Fraction is less than the other,
      * std::strong_ordering::greater if this Fraction is greater than the other,
      * and std::strong_ordering::equal if they are equal.
@@ -209,6 +225,23 @@ public:
         return std::strong_ordering::equal;
     }
 
+    [[nodiscard]] constexpr auto operator<=>(const Type &xIn) const noexcept
+    {
+        if (mDenominator == 0 || xIn.mDenominator == 0)
+        {
+            return std::strong_ordering::equal;
+        }
+
+        auto lhsRatio = static_cast<long double>(mNumerator) / mDenominator;
+        auto rhsRatio = static_cast<long double>(xIn);
+
+        if (lhsRatio < rhsRatio)
+            return std::strong_ordering::less;
+        if (lhsRatio > rhsRatio)
+            return std::strong_ordering::greater;
+        return std::strong_ordering::equal;
+    }
+
     /**
      * @brief Compares this Fraction with another Fraction for equality using the equality operator.
      *
@@ -218,6 +251,11 @@ public:
     [[nodiscard]] constexpr bool operator==(const Fraction &xIn) const noexcept
     {
         return mDenominator == xIn.mDenominator && mNumerator == xIn.mNumerator;
+    }
+
+    [[nodiscard]] constexpr bool operator==(const Type &xIn) const noexcept
+    {
+        return to_long_double() == static_cast<long double>(xIn);
     }
 
     /**
@@ -235,7 +273,7 @@ public:
      *
      * @return The denominator.
      */
-    [[nodiscard]] constexpr Type getDenominator() noexcept
+    [[nodiscard]] constexpr Type &getDenominator() noexcept
     {
         return mDenominator;
     }
@@ -255,7 +293,7 @@ public:
      *
      * @return The numerator.
      */
-    [[nodiscard]] constexpr Type getNumerator() noexcept
+    [[nodiscard]] constexpr Type &getNumerator() noexcept
     {
         return mNumerator;
     }
@@ -308,7 +346,7 @@ public:
         return LCM(mDenominator, other.mDenominator);
     }
 
-    /** 
+    /**
      * @brief Simplifies the fraction by dividing both the numerator and denominator by their greatest common divisor.
      * @return Returns a reference to the simplified fraction.
      **/
@@ -455,6 +493,16 @@ public:
         return lhs;
     }
 
+    constexpr friend Fraction<Type> operator+(const Fraction<Type> &xIn)
+    {
+        return xIn;
+    }
+
+    constexpr friend Fraction<Type> operator-(const Fraction<Type> &xIn)
+    {
+        return Fraction<Type>(-xIn.mNumerator, xIn.mDenominator);
+    }
+
     template <typename Arg_t>
         requires std::is_floating_point_v<Arg_t>
     constexpr friend Fraction<Type> operator+(Fraction<Type> lhs, const Arg_t &rhs)
@@ -520,4 +568,51 @@ public:
         tTemp /= rhs;
         return tTemp;
     }
+
+    constexpr void swap(Fraction<Type> &_lh, Fraction<Type> &_rh) const noexcept(std::is_nothrow_copy_assignable_v<Type> && std::is_nothrow_move_assignable_v<Type> && std::is_nothrow_constructible_v<Type>)
+    {
+        std::swap(_lh.mNumerator, _rh.mNumerator);
+        std::swap(_lh.mDenominator, _rh.mDenominator);
+    }
 };
+
+template <typename Type>
+[[nodiscard]] constexpr Fraction<Type> sin(const Fraction<Type> &_in) noexcept(false)
+{
+    return to_Fraction(::sin(_in.to_double()));
+}
+template <typename Type>
+[[nodiscard]] constexpr Fraction<Type> cos(const Fraction<Type> &_in) noexcept(false)
+{
+    return to_Fraction(::cos(_in.to_double()));
+}
+template <typename Type>
+[[nodiscard]] constexpr Fraction<Type> tan(const Fraction<Type> &_in) noexcept(false)
+{
+    return to_Fraction(::tan(_in.to_double()));
+}
+template <typename Type>
+[[nodiscard]] constexpr Fraction<Type> pow(const Fraction<Type> &_in, const Type &xExp) noexcept(false)
+{
+    return Fraction<Type>{::pow(_in.getNumerator(), xExp), ::pow(_in.getDenominator(), xExp)};
+}
+template <typename Type>
+[[nodiscard]] constexpr Fraction<Type> sqrt(const Fraction<Type> &_in) noexcept(false)
+{
+    return to_Fraction(::sqrt(_in.to_double()));
+}
+template <typename Type>
+[[nodiscard]] constexpr Fraction<Type> atan(const Fraction<Type> &_in) noexcept(false)
+{
+    return to_Fraction(::atan(_in.to_double()));
+}
+template <typename Type>
+[[nodiscard]] constexpr Fraction<Type> hypot(const Fraction<Type> &_lhs, const Fraction<Type> &_rhs) noexcept(false)
+{
+    return ::sqrt(::pow(_lhs, 2) + ::pow(_rhs, 2));
+}
+template <typename Type>
+[[nodiscard]] constexpr Fraction<Type> atan2(const Fraction<Type> &y, const Fraction<Type> &x) noexcept
+{
+    return to_Fraction(::atan2(y.to_double(), x.to_double()));
+}
